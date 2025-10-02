@@ -1,42 +1,29 @@
-Local Log Analysis with ELK Stack on macOS
-This guide provides a complete walkthrough for setting up a local ELK (Elasticsearch, Logstash, Kibana) stack using Docker on macOS to analyze web server access logs for a simulated SQL injection attack.
+## Step 1: Install Tools 🛠️
 
-Prerequisites
-macOS: With an Intel or Apple Silicon processor.
-
-Homebrew: The missing package manager for macOS. If you don't have it, install it first:
+First, open your Terminal. We'll install Homebrew (a package manager) and then use it to install Docker.
 
 Bash
+# Install Homebrew
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-Docker Desktop: A tool for running applications in isolated containers.
 
-Setup Instructions
-1. Install and Configure Docker
-
-First, install Docker Desktop via Homebrew, then launch it and configure its resources.
-
-Bash
 # Install Docker Desktop
 brew install --cask docker
+After this finishes, open Docker Desktop from your Applications folder and make sure it's running. Check its Settings > Resources and give it at least 4 GB of Memory.
 
-# After installation, open Docker from your Applications folder.
-# Click the Docker icon in the menu bar > Settings... > Resources.
-# Ensure Memory is set to a minimum of 4 GB.
-2. Create Project Structure
+## Step 2: Create Your Project Folder 📁
 
-Create a dedicated directory to hold all configuration files and log data.
+Now, let's create a clean folder for all our files.
 
 Bash
-# Create the full directory structure
+# Create all the needed directories and navigate inside
 mkdir -p ~/Desktop/Cyber_Analysis_Project/logstash/pipeline logs
-
-# Navigate into the project's root directory
 cd ~/Desktop/Cyber_Analysis_Project
-3. Define Services with Docker Compose
+## Step 3: Create the Docker Compose File
 
-Create a docker-compose.yml file in the project root. This file defines the three services of the ELK stack.
+This file is the main blueprint for our ELK stack. Paste this into your terminal.
 
-YAML
+Bash
+cat << EOF > docker-compose.yml
 version: '3.8'
 
 services:
@@ -71,11 +58,13 @@ services:
 volumes:
   es_data:
     driver: local
-4. Configure the Logstash Pipeline
+EOF
+## Step 4: Create the Logstash Config
 
-Create a logstash.conf file inside the logstash/pipeline directory. This configuration tells Logstash how to process the log file.
+This file tells Logstash how to understand our logs.
 
-Code snippet
+Bash
+cat << EOF > logstash/pipeline/logstash.conf
 input {
   file {
     path => "/usr/share/logstash/logs/access.log"
@@ -99,11 +88,13 @@ output {
     index => "logstash-access-%{+YYYY.MM.dd}"
   }
 }
-5. Add the Log Data
+EOF
+## Step 5: Create the Log File
 
-Create the access.log file inside the logs directory. This file contains the sample data for our investigation.
+This is the actual evidence file for our investigation.
 
-Code snippet
+Bash
+cat << EOF > logs/access.log
 203.0.113.54 - - [01/Oct/2025:23:10:15 +0530] "GET /portal/login.php HTTP/1.1" 200 1543
 78.45.12.101 - - [01/Oct/2025:23:11:05 +0530] "GET /portal/css/main.css HTTP/1.1" 200 8764
 188.114.97.8 - - [01/Oct/2025:23:12:30 +0530] "GET /portal/admin.php HTTP/1.1" 404 152
@@ -115,51 +106,27 @@ Code snippet
 188.114.97.8 - - [01/Oct/2025:23:15:42 +0530] "GET /portal/studentProfile.php?id=123' UNION SELECT 1,username,password FROM users-- HTTP/1.1" 200 4587
 188.114.97.8 - - [01/Oct/2025:23:15:55 +0530] "GET /portal/studentProfile.php?id=123' UNION SELECT 1,cc_number,cc_expiry FROM credit_cards-- HTTP/1.1" 200 4612
 92.115.34.12 - - [01/Oct/2025:23:16:15 +0530] "GET /portal/index.php HTTP/1.1" 200 2876
-Running the Stack
-With all files in place, launch the ELK stack from the root of your project directory (~/Desktop/Cyber_Analysis_Project).
+EOF
+## Step 6: Launch the Stack 🚀
+
+Now, run the command that brings everything to life. Make sure you're in the Cyber_Analysis_Project directory.
 
 Bash
 docker compose up
-This command will download the required images and start all three containers. This may take several minutes on the first run. Leave this terminal window running.
+Wait a few minutes for it to download and start. Leave this terminal window running.
 
-Performing the Analysis in Kibana
-Access Kibana: Open a web browser and navigate to http://localhost:5601.
+## Step 7: Perform the Analysis in Kibana 🕵️
 
-Create Data View:
+Open your browser to http://localhost:5601.
 
-Click the main menu (☰) > Analytics > Discover.
+Go to the Menu (☰) > Analytics > Discover.
 
-You will be prompted to create a data view.
+Create a Data View named logstash-* (use @timestamp as the time field).
 
-Name: logstash-*
+Set the Time Filter in the top right to Absolute and select 2025-10-01 23:10:00 to 2025-10-01 23:20:00.
 
-Timestamp field: @timestamp
+In the search bar, type "UNION SELECT" and press Enter.
 
-Click Create data view.
+Expand a result, find the source.address field (188.114.97.8), and click the + icon to filter for it.
 
-Isolate the Incident:
-
-In the top-right corner, click the time filter. Select the Absolute tab.
-
-Set the range from 2025-10-01 23:10:00 to 2025-10-01 23:20:00 and click Update.
-
-In the search bar, type "UNION SELECT" and press Enter. This will show you the successful attack logs.
-
-Investigate the Attacker:
-
-Expand one of the log entries.
-
-Find the source.address field (188.114.97.8) and click the + icon to filter for this value.
-
-Clear the "UNION SELECT" text from the search bar and press Enter.
-
-This final view shows the complete, chronological list of all actions performed by the attacker.
-
-Shutdown and Cleanup
-When you are finished, you can shut down the stack and remove the containers and data volume.
-
-Bash
-# In the terminal where the stack is running, press Control + C.
-# Then run the following commands to clean up.
-docker compose down
-docker volume rm Cyber_Analysis_Project_es_data
+Clear "UNION SELECT" from the search bar to see the attacker's full history.
