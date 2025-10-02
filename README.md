@@ -20,6 +20,7 @@ brew install --cask docker
 
 # Create all the needed directories and navigate inside
 mkdir -p ~/Desktop/Cyber_Analysis_Project/logstash/pipeline logs
+
 cd ~/Desktop/Cyber_Analysis_Project
 ## Step 3: Create the Docker Compose File
 
