@@ -15,6 +15,13 @@ After this finishes, open Docker Desktop from your Applications folder and make 
 Now, let's create a clean folder for all our files.
 
 Bash
+
+# Install Homebrew
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Install Docker Desktop
+brew install --cask docker
+
 # Create all the needed directories and navigate inside
 mkdir -p ~/Desktop/Cyber_Analysis_Project/logstash/pipeline logs
 cd ~/Desktop/Cyber_Analysis_Project
