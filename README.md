@@ -2,10 +2,6 @@
 
 First, open your Terminal. We'll install Homebrew (a package manager) and then use it to install Docker.
 
-Bash
-# Install Homebrew
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
 # Install Docker Desktop
 brew install --cask docker
 After this finishes, open Docker Desktop from your Applications folder and make sure it's running. Check its Settings > Resources and give it at least 4 GB of Memory.
