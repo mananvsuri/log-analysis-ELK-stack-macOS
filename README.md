@@ -1,6 +1,10 @@
 ## Step 1: Install Tools 🛠️
 
-First, open your Terminal. We'll install Homebrew (a package manager) and then use it to install Docker.
+First, open your Terminal. We'll install Homebrew and then use it to install Docker.
+
+Bash
+# Install Homebrew
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 # Install Docker Desktop
 brew install --cask docker
@@ -11,21 +15,14 @@ After this finishes, open Docker Desktop from your Applications folder and make 
 Now, let's create a clean folder for all our files.
 
 Bash
-
-# Install Homebrew
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-# Install Docker Desktop
-brew install --cask docker
-
 # Create all the needed directories and navigate inside
 mkdir -p ~/Desktop/Cyber_Analysis_Project/logstash/pipeline logs
-
 cd ~/Desktop/Cyber_Analysis_Project
 ## Step 3: Create the Docker Compose File
 
-This file is the main blueprint for our ELK stack. Paste this into your terminal.
+This file is the main blueprint that tells Docker which programs to install and run. Notice how it lists elasticsearch, logstash, and kibana.
 
+Bash
 cat << EOF > docker-compose.yml
 version: '3.8'
 
@@ -39,7 +36,7 @@ services:
     ports:
       - "9200:9200"
     volumes:
-      - es_data:/usr/share/elasticsearch/data
+      - es_data:/usr_share/elasticsearch/data
 
   logstash:
     image: docker.elastic.co/logstash/logstash:8.9.0
@@ -110,12 +107,14 @@ cat << EOF > logs/access.log
 188.114.97.8 - - [01/Oct/2025:23:15:55 +0530] "GET /portal/studentProfile.php?id=123' UNION SELECT 1,cc_number,cc_expiry FROM credit_cards-- HTTP/1.1" 200 4612
 92.115.34.12 - - [01/Oct/2025:23:16:15 +0530] "GET /portal/index.php HTTP/1.1" 200 2876
 EOF
-## Step 6: Launch the Stack 🚀
+## Step 6: Launch the ELK Stack 🚀
 
-Now, run the command that brings everything to life. Make sure you're in the Cyber_Analysis_Project directory.
+Now, run the command that brings everything to life.
 
 Bash
 docker compose up
+This is the step that installs and runs the entire ELK Stack. Docker reads your docker-compose.yml file, sees the list of services (elasticsearch, logstash, kibana), downloads their official software packages (called images), and runs all of them together. It's an all-in-one command for installation and execution.
+
 Wait a few minutes for it to download and start. Leave this terminal window running.
 
 ## Step 7: Perform the Analysis in Kibana 🕵️
