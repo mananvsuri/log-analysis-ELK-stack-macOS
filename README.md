@@ -26,7 +26,6 @@ cd ~/Desktop/Cyber_Analysis_Project
 
 This file is the main blueprint for our ELK stack. Paste this into your terminal.
 
-Bash
 cat << EOF > docker-compose.yml
 version: '3.8'
 
